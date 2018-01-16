@@ -13,9 +13,13 @@ class Agent:
             if stock_price <= self.cash:
                 self.cash -= stock_price
                 self.stock += 1
+            else:
+                raise ValueError('Out of funds')
         elif action == "sell":
             if self.stock > 0:
                 self.cash += stock_price
                 self.stock -= 1
+            else:
+                raise ValueError('Out of stock')
         else:
             pass

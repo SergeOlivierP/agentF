@@ -27,19 +27,26 @@ for j in range(num_iterations):
 
     agent = Agent(c=5000, q=0)
     sim = Simulation(agent, policy, market)
-    xs, hs, dlogps, drs = sim.run()
+    observed_states, hidden_states, diff, rewards = sim.run()
 
     # stack together all inputs, hidden states, action gradients, and rewards for this episode
-    epx = np.vstack(xs)
-    eph = np.vstack(hs)
-    epdlogp = np.vstack(dlogps)
-    epr = np.vstack(drs)
+    # Why are we doing this?
 
-    discounted_epr = policy.discount_rewards(epr)
-    epdlogp *= discounted_epr  # modulate the gradient with advantage (PG magic happens right here.)
+    # epx = np.vstack(observed_states)
+    # eph = np.vstack(hidden_states)
+    # epdlogp = np.vstack(dlogps)
+    # epr = np.vstack(rewards)
 
-    grad = policy._backward(eph, epdlogp, epx)
-    policy._update(grad, j)
+    observed_states = np.vstack(observed_states)
+    hidden_states = np.vstack(hidden_states)
+    diff = np.vstack(diff)
+    rewards = np.vstack(rewards)
+
+    discounted_epr = policy.discount_rewards(rewards)
+    gradient = discounted_epr * diff
+
+    grad = policy.backward(eph, gradient, observed_states)
+    policy.update(grad, j)
 
     running_reward.append(drs[-1])
 

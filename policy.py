@@ -26,14 +26,14 @@ class Policy:
             discounted_r[t] = running_add
         return discounted_r
 
-    def _forward(self, x):
+    def forward(self, x):
         h = np.dot(self.model['W1'], x)
         h[h < 0] = 0  # ReLU nonlinearity
         logp = np.dot(self.model['W2'], h)
         p = self.sigmoid(logp)
         return p, h  # return probability of taking action 2, and hidden state
 
-    def _backward(self, eph, epdlogp, epx):
+    def backward(self, eph, epdlogp, epx):
         """ backward pass. (eph is array of intermediate hidden states) """
         dW2 = np.dot(eph.T, epdlogp).ravel()
         dh = np.outer(epdlogp, self.model['W2'])
@@ -41,7 +41,7 @@ class Policy:
         dW1 = np.dot(dh.T, epx)
         return {'W1': dW1, 'W2': dW2}
 
-    def _update(self, grad, episode_number):
+    def update(self, grad, episode_number):
         for k in self.model:
             self.grad_buffer[k] += grad[k]
 

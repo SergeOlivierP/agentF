@@ -15,48 +15,48 @@ class Simulation:
         self.start_day = randint(0, floor(market.duration/2))
         self.end_day = self.start_day + self.DURATION
 
+    def run_transaction(self, action, stock_price):
+        try:
+            self.agent.transaction(action, stock_price)
+            reward = 0.1
+            reward_sum = 0.1
+        except ValueError:
+            reward = 0.1
+            reward_sum = 0.1
+        return reward
+
     def run(self):
 
-        immediate_reward_sum = 0
-        xs, hs, dlogps, drs = [], [], [], []
+        reward_sum = 0
+        observed_states = []
+        hidden_states = []
+        rewards = []
+        diff = []
 
         for i in range(self.start_day, self.end_day):
 
             immediate_reward = 0
-            # Appending the current state of the agent
+
             state = np.concatenate((self.market.indices[i], self.agent.state), axis=0)
+            action_prob, hidden = self.policy.forward(state)
 
-            aprob, h = self.policy._forward(state)  # compute bias for coin toss from decision policy
-            action = "buy" if np.random.uniform() < aprob else "sell"  # randomly decide what to do from policy!
-            self.agent.transaction(action, self.market.stock_price[i])
+            if np.random.uniform() < action_prob
+                action = "buy"
+                y = 1
+            else:
+                action = "sell"
+                y = 0  # a "fake label"
 
-            # THE REGULATOR
-            if action == "sell":
-                if self.agent.stock <= 0:
-                    immediate_reward -= 0.1
-                    immediate_reward_sum -= 0.1
-                if self.agent.stock >= 0:
-                    immediate_reward += 0.1
-                    immediate_reward_sum += 0.1
-            elif action == "buy":
-                if self.agent.cash <= 0:
-                    immediate_reward -= 0.1
-                    immediate_reward_sum -= 0.1
-                if self.agent.cash >= 0:
-                    immediate_reward += 0.1
-                    immediate_reward_sum += 0.1
+            immediate_reward = self.run_transaction(action, self.market.stock_price[i])
+            reward_sum += immediate_reward
 
-            self.agent.transaction(action, self.market.stock_price[i])
-
-            y = 1 if action == "buy" else 0  # a "fake label"
-
-            xs.append(state)  # observation
-            hs.append(h)  # hidden state
-            dlogps.append(y - aprob)
-            drs.append(immediate_reward)
+            observed_states.append(state)  # observation
+            hidden_states.append(hidden)  # hidden state
+            diff.append(y - aprob)
+            rewards.append(immediate_reward)
 
             assets = self.agent.cash + self.agent.stock*self.market.stock_price[self.end_day-1]
             reward = ((assets - self.init_cash) / self.init_cash)
-            drs[-1] = drs[-1] + reward
+            rewards[-1] = drs[-1] + reward
 
-        return xs, hs, dlogps, drs
+        return observed_states, hidden_states, diff, rewards
