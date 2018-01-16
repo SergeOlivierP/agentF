@@ -29,26 +29,18 @@ for j in range(num_iterations):
     sim = Simulation(agent, policy, market)
     observed_states, hidden_states, diff, rewards = sim.run()
 
-    # stack together all inputs, hidden states, action gradients, and rewards for this episode
-    # Why are we doing this?
-
-    # epx = np.vstack(observed_states)
-    # eph = np.vstack(hidden_states)
-    # epdlogp = np.vstack(dlogps)
-    # epr = np.vstack(rewards)
-
     observed_states = np.vstack(observed_states)
     hidden_states = np.vstack(hidden_states)
     diff = np.vstack(diff)
     rewards = np.vstack(rewards)
 
-    discounted_epr = policy.discount_rewards(rewards)
-    gradient = discounted_epr * diff
+    discounted_reward = policy.discount_rewards(rewards)
+    gradient = discounted_reward * diff
 
-    grad = policy.backward(eph, gradient, observed_states)
+    grad = policy.backward(hidden_states, gradient, observed_states)
     policy.update(grad, j)
 
-    running_reward.append(drs[-1])
+    running_reward.append(rewards[-1])
 
     if j % 100 == 0:
         mean = np.mean(running_reward)
