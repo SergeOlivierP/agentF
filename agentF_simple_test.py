@@ -1,7 +1,7 @@
 import unittest
 from agent import Agent
 from market import Market
-# from simulation import Simulation
+from simulation import Simulation
 
 
 class AgentTest(unittest.TestCase):

@@ -18,43 +18,37 @@ class Simulation:
     def run_transaction(self, action, stock_price):
         try:
             self.agent.transaction(action, stock_price)
-            reward = 0.1
+            cost = 0.002
         except ValueError:
-            reward = -0.1
-        return reward
+            cost = 0.05
+
+        transaction_cost = cost*stock_price
+        assets = self.agent.cash + self.agent.stock*self.market.stock_price[self.end_day-1]
+        assets -= transaction_cost
+        reward = ((assets - self.init_cash) / self.init_cash)
+
+        return reward, assets
+
+    def compute_cost_function(self, y, action_prob, reward):
+        return (y - action_prob) * reward
 
     def run(self):
 
-        reward_sum = 0
-        observed_states = []
-        hidden_states = []
-        rewards = []
-        diff = []
-
         for i in range(self.start_day, self.end_day):
 
-            immediate_reward = 0
-
             state = np.concatenate((self.market.indices[i], self.agent.state), axis=0)
-            action_prob, hidden = self.policy.forward(state)
+            action_prob = self.policy.forward(state)
 
             if np.random.uniform() < action_prob:
                 action = "buy"
                 y = 1
             else:
                 action = "sell"
-                y = 0  # a "fake label"
+                y = 0
 
-            immediate_reward = self.run_transaction(action, self.market.stock_price[i])
-            reward_sum += immediate_reward
+            reward, assets = self.run_transaction(action, self.market.stock_price[i])
+            y_hat = self.compute_cost_function(y, action_prob, reward)
 
-            observed_states.append(state)  # observation
-            hidden_states.append(hidden)  # hidden state
-            diff.append(y - action_prob)
-            rewards.append(immediate_reward)
+            self.policy.update(state, y_hat, i)
 
-            assets = self.agent.cash + self.agent.stock*self.market.stock_price[self.end_day-1]
-            reward = ((assets - self.init_cash) / self.init_cash)
-            rewards[-1] = rewards[-1] + reward
-
-        return observed_states, hidden_states, diff, rewards
+        return self.policy, assets

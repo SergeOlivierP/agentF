@@ -18,7 +18,6 @@ market = Market('IntelDataSet.csv')
 D = np.shape(market.indices)[1]+2
 policy = Policy(H, D, gamma, batch_size, decay_rate, learning_rate)
 running_reward = []
-reward_sum = 0
 
 # Output for further analysis, should also output model parameters
 output = open("{}".format(datetime.now().strftime('%Y/%m/%d %H:%M:%S')), "w")
@@ -27,25 +26,14 @@ for j in range(num_iterations):
 
     agent = Agent(c=5000, q=0)
     sim = Simulation(agent, policy, market)
-    observed_states, hidden_states, diff, rewards = sim.run()
+    policy, assets = sim.run()
 
-    observed_states = np.vstack(observed_states)
-    hidden_states = np.vstack(hidden_states)
-    diff = np.vstack(diff)
-    rewards = np.vstack(rewards)
-
-    discounted_reward = policy.discount_rewards(rewards)
-    gradient = discounted_reward * diff
-
-    grad = policy.backward(hidden_states, gradient, observed_states)
-    policy.update(grad, j)
-
-    running_reward.append(rewards[-1])
+    running_reward.append(assets)
 
     if j % 100 == 0:
         mean = np.mean(running_reward)
         running_reward = []
-        print("Average return rate (round {}): {:10.2f}".format(j, mean))
+        print("Average cumulated asset value (round {}): {:10.2f}".format(j, mean))
         output.write("{:10.2f}\n".format(mean))
 
 output.close()
