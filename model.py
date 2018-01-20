@@ -1,4 +1,4 @@
-from policy import Policy
+from policy_keras import Policy
 from agent import Agent
 from simulation import Simulation
 from market import Market
@@ -13,14 +13,14 @@ learning_rate = 1e-4
 gamma = 0.99  # discount factor for reward
 decay_rate = 0.99  # decay factor for RMSProp leaky sum of grad^2
 
-num_iterations = 5000000
+num_iterations = 5
 market = Market('IntelDataSet.csv')
 D = np.shape(market.indices)[1]+2
 policy = Policy(H, D, gamma, batch_size, decay_rate, learning_rate)
 running_reward = []
 
 # Output for further analysis, should also output model parameters
-output = open("{}".format(datetime.now().strftime('%Y/%m/%d %H:%M:%S')), "w")
+# output = open("{}".format(datetime.now().strftime('%Y/%m/%d %H:%M:%S')), "w")
 
 for j in range(num_iterations):
 
@@ -36,4 +36,4 @@ for j in range(num_iterations):
         print("Average cumulated asset value (round {}): {:10.2f}".format(j, mean))
         output.write("{:10.2f}\n".format(mean))
 
-output.close()
+# output.close()

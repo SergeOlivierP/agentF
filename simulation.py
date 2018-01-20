@@ -37,7 +37,7 @@ class Simulation:
         for i in range(self.start_day, self.end_day):
 
             state = np.concatenate((self.market.indices[i], self.agent.state), axis=0)
-            action_prob = self.policy.forward(state)
+            action_prob = self.policy.decide(state)
 
             if np.random.uniform() < action_prob:
                 action = "buy"
@@ -49,6 +49,6 @@ class Simulation:
             reward, assets = self.run_transaction(action, self.market.stock_price[i])
             y_hat = self.compute_cost_function(y, action_prob, reward)
 
-            self.policy.update(state, y_hat, i)
+            self.policy.train(state, y_hat, i)
 
         return self.policy, assets
