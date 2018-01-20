@@ -25,10 +25,13 @@ class Session:
         transaction_cost = cost
         reward = ((future_stock_price - transaction_cost - stock_price) / stock_price)
 
+        if action == "sell":
+            reward = -reward
+
         return reward
 
     def compute_cost_function(self, y, action_prob, reward):
-        return (y - action_prob) * reward
+        return action_prob + (y - action_prob) * reward
 
     def run(self):
 
@@ -44,9 +47,10 @@ class Session:
                 action = "sell"
                 y = 0
 
-            reward = self.run_transaction(action, self.market.stock_price[i], self.market.stock_price[i+1] )
+            reward = self.run_transaction(action, self.market.stock_price[i], self.market.stock_price[i+1])
             y_hat = self.compute_cost_function(y, action_prob, reward)
 
             self.policy.train(state, y_hat, i)
 
-        return self.policy
+        asset = self.agent.cash+self.agent.stock*self.market.stock_price[-1]
+        return self.policy, asset

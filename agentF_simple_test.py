@@ -29,7 +29,7 @@ class AgentTest(unittest.TestCase):
 class SessionTest(unittest.TestCase):
 
     def setUp(self):
-        self.agent = Agent(100, 0)
+        self.agent = Agent(100, 10)
         self.policy = MagicMock()
         self.market = MagicMock()
         self.market.stock_price = [10, 15, 20, 25]

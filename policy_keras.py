@@ -18,7 +18,7 @@ class Policy:
 
     def _build_model(self):
         model = Sequential()
-        model.add(Dense(81, input_shape=(self.input_dimension,)))
+        model.add(Dense(100, input_shape=(self.input_dimension,)))
         model.add(Dense(64, activation='relu', init='he_uniform'))
         model.add(Dense(32, activation='relu', init='he_uniform'))
         model.add(Dense(1, activation='sigmoid'))
@@ -29,7 +29,7 @@ class Policy:
     def decide(self, state):
         state = state.reshape(1, state.shape[0])
         action_prob = self.model.predict(state, batch_size=1).flatten()
-        return action_prob[0]
+        return action_prob
 
     def train(self, state, y_hat, i):
         y_hat = np.array([y_hat])
