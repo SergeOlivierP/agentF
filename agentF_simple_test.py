@@ -29,25 +29,28 @@ class AgentTest(unittest.TestCase):
 class SessionTest(unittest.TestCase):
 
     def setUp(self):
-        self.agent = Agent(10, 0)
+        self.agent = Agent(100, 0)
         self.policy = MagicMock()
         self.market = MagicMock()
-        self.market.stock_price = [10, 10]
+        self.market.stock_price = [10, 15, 20, 25]
         self.session = Session(self.agent, self.policy, self.market)
 
     def test_run_transaction(self):
         self.session.trade_cost = 0.1
         self.session.end_day = 1
 
-        self.session.agent = Agent(100, 0)
-        price1 = 10
-        reward1, assets = self.session.run_transaction("buy", price1)
+        reward1 = self.session.run_transaction("buy", 10, 15)
+        reward2 = self.session.run_transaction("buy", 10, 20)
 
-        self.session.agent = Agent(100, 0)
-        price2 = 20
-        reward2, assets = self.session.run_transaction("buy", price2)
+        reward3 = self.session.run_transaction("sell", 15, 10)
+        reward4 = self.session.run_transaction("sell", 15, 12)
 
-        self.assertEqual(reward2, reward1)
+        self.assertGreater(reward2, reward1)
+        self.assertGreater(reward3, reward4)
+        self.assertTrue(reward1 > 0 and reward1 < 1)
+        self.assertTrue(reward2 > 0 and reward2 < 1)
+        self.assertTrue(reward3 > 0 and reward3 < 1)
+        self.assertTrue(reward4 > 0 and reward4 < 1)
 
 
 class PolicyTest(unittest.TestCase):
@@ -58,8 +61,8 @@ class PolicyTest(unittest.TestCase):
     def test_policy_decide(self):
         data = np.random.random((10))
         action = self.network.decide(data)
-        self.assertEqual(len(action), 1)
-
+        self.assertGreater(action, 0)
+        self.assertLess(action, 1)
 
 
 if __name__ == '__main__':
