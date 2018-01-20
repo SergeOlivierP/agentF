@@ -11,12 +11,9 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 class Policy:
 
-    def __init__(self, H, D, gamma, batch_size, decay_rate, learning_rate):
-        self.batch_size = batch_size
+    def __init__(self, input_dim, learning_rate=1e-4):
         self.learning_rate = learning_rate
-        self.decay_rate = decay_rate
-        self.gamma = gamma
-        self.input_dimension = D
+        self.input_dimension = input_dim
         self.model = self._build_model()
 
     def _build_model(self):
@@ -24,7 +21,7 @@ class Policy:
         model.add(Dense(81, input_shape=(self.input_dimension,)))
         model.add(Dense(64, activation='relu', init='he_uniform'))
         model.add(Dense(32, activation='relu', init='he_uniform'))
-        model.add(Dense(2, activation='softmax'))
+        model.add(Dense(1, activation='sigmoid'))
         opt = Adam(lr=self.learning_rate)
         model.compile(loss='binary_crossentropy', optimizer=opt)
         return model
@@ -35,7 +32,7 @@ class Policy:
         return action_prob[0]
 
     def train(self, state, y_hat, i):
-        y_hat = np.array([y_hat, 1-y_hat])
+        y_hat = np.array([y_hat])
         y_hat = np.vstack([y_hat])
         state = np.vstack([state])
         self.model.fit(state, y_hat, verbose=0)
