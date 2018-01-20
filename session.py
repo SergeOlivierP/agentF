@@ -15,7 +15,7 @@ class Session:
         self.trade_cost = trade_cost
         self.sanction = sanction
 
-    def run_transaction(self, action, stock_price):
+    def run_transaction(self, action, stock_price, future_stock_price):
         try:
             self.agent.transaction(action, stock_price)
             cost = self.trade_cost
@@ -23,18 +23,16 @@ class Session:
             cost = self.sanction
 
         transaction_cost = cost
-        assets = self.agent.cash + self.agent.stock*stock_price
-        assets -= transaction_cost
-        reward = ((assets - self.init_cash) / self.init_cash)
+        reward = ((future_stock_price - transaction_cost - stock_price) / stock_price)
 
-        return reward, assets
+        return reward
 
     def compute_cost_function(self, y, action_prob, reward):
         return (y - action_prob) * reward
 
     def run(self):
 
-        for i in range(self.start_day, self.end_day):
+        for i in range(self.start_day, self.end_day-1):
 
             state = np.concatenate((self.market.indices[i], self.agent.state), axis=0)
             action_prob = self.policy.decide(state)
@@ -46,9 +44,9 @@ class Session:
                 action = "sell"
                 y = 0
 
-            reward, assets = self.run_transaction(action, self.market.stock_price[i])
+            reward = self.run_transaction(action, self.market.stock_price[i], self.market.stock_price[i+1] )
             y_hat = self.compute_cost_function(y, action_prob, reward)
 
             self.policy.train(state, y_hat, i)
 
-        return self.policy, assets
+        return self.policy
