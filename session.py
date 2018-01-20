@@ -1,5 +1,3 @@
-from math import floor
-from random import randint
 import numpy as np
 
 
@@ -7,23 +5,25 @@ class Session:
 
     DURATION = 20
 
-    def __init__(self, agent, policy, market):
+    def __init__(self, agent, policy, market, start_day=0, trade_cost=0.002, sanction=0.05):
         self.agent = agent
         self.policy = policy
         self.market = market
         self.init_cash = self.agent.cash
-        self.start_day = randint(0, floor(market.duration/2))
+        self.start_day = start_day
         self.end_day = self.start_day + self.DURATION
+        self.trade_cost = trade_cost
+        self.sanction = sanction
 
     def run_transaction(self, action, stock_price):
         try:
             self.agent.transaction(action, stock_price)
-            cost = 0.002
+            cost = self.trade_cost
         except ValueError:
-            cost = 0.05
+            cost = self.sanction
 
-        transaction_cost = cost*stock_price
-        assets = self.agent.cash + self.agent.stock*self.market.stock_price[self.end_day-1]
+        transaction_cost = cost
+        assets = self.agent.cash + self.agent.stock*stock_price
         assets -= transaction_cost
         reward = ((assets - self.init_cash) / self.init_cash)
 
