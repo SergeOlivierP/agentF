@@ -34,6 +34,6 @@ for j in range(num_iterations):
         mean = np.mean(running_reward)
         running_reward = []
         print("Average cumulated asset value (round {}): {:10.2f}".format(j, mean))
-        output.write("{:10.2f}\n".format(mean))
+        # output.write("{:10.2f}\n".format(mean))
 
 # output.close()

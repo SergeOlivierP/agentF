@@ -2,7 +2,11 @@ import numpy as np
 from keras.models import Sequential
 from keras.layers import Dense, Reshape, Flatten
 from keras.optimizers import Adam
-from keras.layers.convolutional import Convolution2D
+import tensorflow as tf
+import os
+
+
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 
 class Policy:
@@ -32,6 +36,7 @@ class Policy:
 
     def train(self, state, y_hat, i):
         y_hat = np.array([y_hat, 1-y_hat])
+        y_hat = np.vstack([y_hat])
         state = np.vstack([state])
-        self.model.fit(state, y_hat)
+        self.model.fit(state, y_hat, verbose=0)
         pass
