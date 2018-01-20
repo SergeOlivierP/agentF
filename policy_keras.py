@@ -21,7 +21,7 @@ class Policy:
 
     def _build_model(self):
         model = Sequential()
-        model.add(Dense(80, input_shape=(self.input_dimension,)))
+        model.add(Dense(81, input_shape=(self.input_dimension,)))
         model.add(Dense(64, activation='relu', init='he_uniform'))
         model.add(Dense(32, activation='relu', init='he_uniform'))
         model.add(Dense(2, activation='softmax'))
