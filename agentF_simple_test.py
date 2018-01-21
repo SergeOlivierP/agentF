@@ -1,7 +1,6 @@
 import unittest
 from unittest.mock import MagicMock
 from agent import Agent
-from market import Market
 from session import Session
 from policy_keras import Policy
 import numpy as np
@@ -35,22 +34,43 @@ class SessionTest(unittest.TestCase):
         self.market.stock_price = [10, 15, 20, 25]
         self.session = Session(self.agent, self.policy, self.market)
 
-    def test_run_transaction(self):
+    def test_run_transaction_rewards_buy(self):
         self.session.trade_cost = 0.1
         self.session.end_day = 1
 
         reward1 = self.session.run_transaction("buy", 10, 15)
         reward2 = self.session.run_transaction("buy", 10, 20)
 
+        self.assertGreater(reward2, reward1)
+        self.assertTrue(reward1 > 0 and reward1 < 1)
+        self.assertTrue(reward2 > 0 and reward2 < 1)
+
+    def run_transaction_rewards_sell(self):
+        self.session.trade_cost = 0.1
+        self.session.end_day = 1
+
         reward3 = self.session.run_transaction("sell", 15, 10)
         reward4 = self.session.run_transaction("sell", 15, 12)
 
-        self.assertGreater(reward2, reward1)
         self.assertGreater(reward3, reward4)
-        self.assertTrue(reward1 > 0 and reward1 < 1)
-        self.assertTrue(reward2 > 0 and reward2 < 1)
         self.assertTrue(reward3 > 0 and reward3 < 1)
         self.assertTrue(reward4 > 0 and reward4 < 1)
+
+    def test_run_cost_is_prohibitive(self):
+        self.session.trade_cost = 0.01
+        self.session.sanction = 0.1
+        self.session.end_day = 1
+
+        reward1 = self.session.run_transaction("buy", 10, 10)
+        self.session.agent = Agent(100, 0)
+        reward2 = self.session.run_transaction("sell", 10, 10)
+
+        print(reward1)
+        print(reward2)
+        self.assertLess(reward1, 0)
+        self.assertLess(reward2, 0)
+        self.assertLess(reward2, reward1)
+        self.assertTrue(False)
 
 
 class PolicyTest(unittest.TestCase):

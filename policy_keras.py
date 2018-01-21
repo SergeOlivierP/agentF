@@ -1,8 +1,8 @@
 import numpy as np
 from keras.models import Sequential
-from keras.layers import Dense, Reshape, Flatten
+from keras.layers import Dense
 from keras.optimizers import Adam
-import tensorflow as tf
+from keras.utils import normalize
 import os
 
 
@@ -27,8 +27,9 @@ class Policy:
         return model
 
     def decide(self, state):
-        state = state.reshape(1, state.shape[0])
-        action_prob = self.model.predict(state, batch_size=1).flatten()
+        X = state.reshape(1, state.shape[0])
+        X = normalize(X, axis=0)
+        action_prob = self.model.predict(X, batch_size=1).flatten()
         return action_prob
 
     def train(self, state, y_hat, i):
