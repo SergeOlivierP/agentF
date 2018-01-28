@@ -10,19 +10,19 @@ class AgentTest(unittest.TestCase):
 
     def test_agent_buy_stock(self):
         agent = Agent(100, 10)
-        agent.transaction("buy", 10)
+        agent.transaction(1, 10)
         self.assertEqual(agent.stock, 11)
         self.assertEqual(agent.cash, 90)
 
     def test_agent_buy_stock_no_cash(self):
         agent = Agent(0, 10)
         with self.assertRaises(ValueError):
-            agent.transaction("buy", 10)
+            agent.transaction(1, 10)
 
     def test_agent_sells_no_stock(self):
         agent = Agent(10, 0)
         with self.assertRaises(ValueError):
-            agent.transaction("sell", 10)
+            agent.transaction(0, 10)
 
 
 class SessionTest(unittest.TestCase):
@@ -38,10 +38,28 @@ class SessionTest(unittest.TestCase):
         self.session.trade_cost = 0.1
         self.session.end_day = 1
 
-        reward1 = self.session.run_transaction("buy", 10, 15)
-        reward2 = self.session.run_transaction("buy", 10, 20)
+        reward1 = self.session.run_transaction(y=1,
+                                               stock_price=10,
+                                               future=15,
+                                               )
+        reward2 = self.session.run_transaction(y=1,
+                                               stock_price=10,
+                                               future=12,
+                                               )
+        reward3 = self.session.run_transaction(y=1,
+                                               stock_price=15,
+                                               future=10,
+                                               )
+        reward4 = self.session.run_transaction(y=1,
+                                               stock_price=15,
+                                               future=12,
+                                               )
 
-        self.assertGreater(reward2, reward1)
+        self.assertGreater(reward1, 0.5)
+        self.assertLess(reward3, 0.5)
+        self.assertGreater(reward1, reward2)
+        self.assertGreater(reward4, reward3)
+        self.assertGreater(reward1, reward3)
         self.assertTrue(reward1 > 0 and reward1 < 1)
         self.assertTrue(reward2 > 0 and reward2 < 1)
 
@@ -49,28 +67,46 @@ class SessionTest(unittest.TestCase):
         self.session.trade_cost = 0.1
         self.session.end_day = 1
 
-        reward3 = self.session.run_transaction("sell", 15, 10)
-        reward4 = self.session.run_transaction("sell", 15, 12)
+        reward1 = self.session.run_transaction(y=0,
+                                               stock_price=10,
+                                               future=15,
+                                               )
+        reward2 = self.session.run_transaction(y=0,
+                                               stock_price=10,
+                                               future=12,
+                                               )
 
+        reward3 = self.session.run_transaction(y=0,
+                                               stock_price=15,
+                                               future=10,
+                                               )
+        reward4 = self.session.run_transaction(y=0,
+                                               stock_price=15,
+                                               future=12,
+                                               )
+
+        self.assertGreater(reward3, reward1)
         self.assertGreater(reward3, reward4)
-        self.assertTrue(reward3 > 0 and reward3 < 1)
-        self.assertTrue(reward4 > 0 and reward4 < 1)
+        self.assertGreater(reward2, reward1)
+        self.assertTrue(reward1 > 0 and reward2 < 1)
+        self.assertTrue(reward1 > 0 and reward2 < 1)
 
     def test_run_cost_is_prohibitive(self):
         self.session.trade_cost = 0.01
         self.session.sanction = 0.1
         self.session.end_day = 1
 
-        reward1 = self.session.run_transaction("buy", 10, 10)
+        reward1 = self.session.run_transaction(y=1,
+                                               stock_price=10,
+                                               future=10)
         self.session.agent = Agent(100, 0)
-        reward2 = self.session.run_transaction("sell", 10, 10)
+        reward2 = self.session.run_transaction(y=0,
+                                               stock_price=10,
+                                               future=10)
 
-        print(reward1)
-        print(reward2)
-        self.assertLess(reward1, 0)
-        self.assertLess(reward2, 0)
+        self.assertLess(reward1, 0.5)
+        self.assertLess(reward2, 0.5)
         self.assertLess(reward2, reward1)
-        self.assertTrue(False)
 
 
 class PolicyTest(unittest.TestCase):

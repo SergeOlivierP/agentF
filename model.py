@@ -10,11 +10,12 @@ import numpy as np
 
 # Model hyperparameters
 
-num_iterations = 10
+num_iterations = 5000
 market = Market('IntelDataSet.csv')
 D = np.shape(market.indices)[1]+2
 policy = Policy(D)
 running_reward = []
+
 
 # Output for further analysis, should also output model parameters
 # output = open("{}".format(datetime.now().strftime('%Y/%m/%d %H:%M:%S')), "w")

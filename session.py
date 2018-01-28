@@ -15,23 +15,17 @@ class Session:
         self.trade_cost = trade_cost
         self.sanction = sanction
 
-    def run_transaction(self, action, stock_price, future_stock_price):
+    def run_transaction(self, y, stock_price, future):
+
         try:
-            self.agent.transaction(action, stock_price)
+            self.agent.transaction(y, stock_price)
             cost = self.trade_cost
         except ValueError:
             cost = self.sanction
 
-        transaction_cost = cost
-        reward = ((future_stock_price - transaction_cost - stock_price) / stock_price)
+        profit = future - cost - stock_price
 
-        if action == "sell":
-            reward = -reward
-
-        return reward
-
-    def compute_cost_function(self, y, action_prob, reward):
-        return action_prob + (y - action_prob) * reward
+        return 1 / (1 + np.exp(-profit))
 
     def run(self):
 
@@ -41,14 +35,13 @@ class Session:
             action_prob = self.policy.decide(state)
 
             if np.random.uniform() < action_prob:
-                action = "buy"
+                # transaction: "buy"
                 y = 1
             else:
-                action = "sell"
+                # transaction: "sell"
                 y = 0
 
-            reward = self.run_transaction(action, self.market.stock_price[i], self.market.stock_price[i+1])
-            y_hat = self.compute_cost_function(y, action_prob, reward)
+            y_hat = self.run_transaction(y, self.market.stock_price[i], self.market.stock_price[i+1])
 
             self.policy.train(state, y_hat, i)
 
