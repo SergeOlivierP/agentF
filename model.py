@@ -10,7 +10,7 @@ import numpy as np
 
 # Model hyperparameters
 
-num_iterations = 5000
+num_iterations = 1
 market = Market('IntelDataSet.csv')
 D = np.shape(market.indices)[1]+2
 policy = Policy(D)

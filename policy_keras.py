@@ -2,7 +2,6 @@ import numpy as np
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.optimizers import Adam
-from keras.utils import normalize
 import os
 
 
@@ -18,17 +17,16 @@ class Policy:
 
     def _build_model(self):
         model = Sequential()
-        model.add(Dense(100, input_shape=(self.input_dimension,)))
-        model.add(Dense(64, activation='relu', init='he_uniform'))
-        model.add(Dense(32, activation='relu', init='he_uniform'))
+        model.add(Dense(20, input_shape=(self.input_dimension,), activation="relu"))
+        # model.add(Dense(64, activation='relu', init='he_uniform'))
+        # model.add(Dense(32, activation='relu', init='he_uniform'))
         model.add(Dense(1, activation='sigmoid'))
         opt = Adam(lr=self.learning_rate)
-        model.compile(loss='binary_crossentropy', optimizer=opt)
+        model.compile(loss='mean_squared_error', optimizer=opt)
         return model
 
     def decide(self, state):
         X = state.reshape(1, state.shape[0])
-        X = normalize(X, axis=0)
         action_prob = self.model.predict(X, batch_size=1).flatten()
         return action_prob
 
@@ -37,4 +35,6 @@ class Policy:
         y_hat = np.vstack([y_hat])
         state = np.vstack([state])
         self.model.fit(state, y_hat, verbose=0)
+        if (i % 10 == 0):
+            print("{} {}: {}".format("Weights for run", i, self.model.get_weights()[-2]))
         pass

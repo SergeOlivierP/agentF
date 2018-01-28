@@ -6,7 +6,7 @@ class Agent:
     def __init__(self, c, q):
         self.cash = c
         self.stock = q
-        self.state = np.array([self.cash, self.stock])
+        self.state = self.compute_state(self.cash, self.stock)
 
     def transaction(self, action, stock_price):
         if action == 1:
@@ -23,5 +23,9 @@ class Agent:
                 self.stock -= 1
             else:
                 raise ValueError('Out of stock')
-        else:
-            pass
+        self.state = self.compute_state(self.cash, self.stock)
+
+    def compute_state(self, cash, stock):
+        got_money = 1 if cash > 0 else 0
+        got_stock = 1 if stock > 0 else 0
+        return np.array([got_money, got_stock])

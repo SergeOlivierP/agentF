@@ -24,6 +24,14 @@ class AgentTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             agent.transaction(0, 10)
 
+    def test_agent_state_updates(self):
+        agent = Agent(100, 0)
+        self.assertIn(0, agent.state)
+        self.assertIn(1, agent.state)
+        agent.transaction(1, 10)
+        self.assertIn(1, agent.state)
+        self.assertIn(1, agent.state)
+
 
 class SessionTest(unittest.TestCase):
 
@@ -117,8 +125,7 @@ class PolicyTest(unittest.TestCase):
     def test_policy_decide(self):
         data = np.random.random((10))
         action = self.network.decide(data)
-        self.assertGreater(action, 0)
-        self.assertLess(action, 1)
+        self.assertTrue(action > 0 and action < 1)
 
 
 if __name__ == '__main__':
