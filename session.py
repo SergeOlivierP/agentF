@@ -3,15 +3,17 @@ import numpy as np
 
 class Session:
 
-    DURATION = 20
-
-    def __init__(self, agent, policy, market, start_day=0, trade_cost=0.002, sanction=0.05):
+    def __init__(self, agent, policy, market,
+                 start_day=0,
+                 trade_cost=0.002,
+                 sanction=0.05,
+                 duration=500):
         self.agent = agent
         self.policy = policy
         self.market = market
         self.init_cash = self.agent.cash
         self.start_day = start_day
-        self.end_day = self.start_day + self.DURATION
+        self.end_day = self.start_day + duration
         self.trade_cost = trade_cost
         self.sanction = sanction
 

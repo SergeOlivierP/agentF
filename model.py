@@ -3,8 +3,6 @@ from agent import Agent
 from session import Session
 from market import Market
 from datetime import datetime
-from random import randint
-from math import floor
 import numpy as np
 
 
@@ -13,7 +11,8 @@ import numpy as np
 num_iterations = 500000
 market = Market('IntelDataSet.csv')
 D = np.shape(market.indices)[1]+2
-policy = Policy(D)
+policy = Policy(input_dim=D,
+                learning_rate=1e-4)
 running_reward = []
 
 
@@ -26,6 +25,7 @@ for j in range(num_iterations):
                       policy=policy,
                       market=market,
                       start_day=0,
+                      duration=100,
                       )
     policy, asset = session.run()
 
