@@ -3,7 +3,7 @@ import numpy as np
 
 class Session:
 
-    DURATION = 100
+    DURATION = 20
 
     def __init__(self, agent, policy, market, start_day=0, trade_cost=0.002, sanction=0.05):
         self.agent = agent

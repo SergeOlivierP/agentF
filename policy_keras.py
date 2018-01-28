@@ -22,7 +22,7 @@ class Policy:
         # model.add(Dense(32, activation='relu', init='he_uniform'))
         model.add(Dense(1, activation='sigmoid'))
         opt = Adam(lr=self.learning_rate)
-        model.compile(loss='mean_squared_error', optimizer=opt)
+        model.compile(loss='binary_crossentropy', optimizer=opt)
         return model
 
     def decide(self, state):
@@ -35,6 +35,4 @@ class Policy:
         y_hat = np.vstack([y_hat])
         state = np.vstack([state])
         self.model.fit(state, y_hat, verbose=0)
-        if (i % 10 == 0):
-            print("{} {}: {}".format("Weights for run", i, self.model.get_weights()[-2]))
         pass

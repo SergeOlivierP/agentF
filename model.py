@@ -10,7 +10,7 @@ import numpy as np
 
 # Model hyperparameters
 
-num_iterations = 1
+num_iterations = 5000
 market = Market('IntelDataSet.csv')
 D = np.shape(market.indices)[1]+2
 policy = Policy(D)
@@ -31,7 +31,7 @@ for j in range(num_iterations):
 
     running_reward.append(asset)
 
-    if j % 1 == 0:
+    if j % 100 == 0:
         mean = np.mean(running_reward)
         running_reward = []
         print("Average cumulated asset value (round {}): {:10.2f}".format(j, mean))
