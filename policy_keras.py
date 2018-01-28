@@ -31,6 +31,7 @@ class Policy:
         return action_prob
 
     def train(self, state, y_hat, i):
+        # y_hat = np.around(y_hat)
         y_hat = np.array([y_hat])
         y_hat = np.vstack([y_hat])
         state = np.vstack([state])

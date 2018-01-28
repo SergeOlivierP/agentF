@@ -45,5 +45,5 @@ class Session:
 
             self.policy.train(state, y_hat, i)
 
-        asset = self.agent.cash+self.agent.stock*self.market.stock_price[-1]
+        asset = self.agent.cash+self.agent.stock*self.market.stock_price[i]
         return self.policy, asset
