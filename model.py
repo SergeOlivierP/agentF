@@ -1,8 +1,7 @@
-from policy_keras import Policy
 from agent import Agent
-from session import Session
+from portfolio import Portfolio
+from environment import Environment
 from market import Market
-from datetime import datetime
 from math import floor
 from random import randint
 import numpy as np
@@ -13,8 +12,7 @@ import numpy as np
 num_iterations = 500000
 market = Market('IntelDataSet.csv')
 D = np.shape(market.indices)[1]+2
-policy = Policy(input_dim=D,
-                learning_rate=1e-4)
+agent = Agent(input_dim=D, learning_rate=1e-4)
 running_reward = []
 
 
@@ -23,13 +21,13 @@ running_reward = []
 
 for j in range(num_iterations):
 
-    session = Session(agent=Agent(c=5000, q=0),
-                      policy=policy,
-                      market=market,
-                      start_day=randint(0, floor(market.duration/2)),
-                      duration=100,
-                      )
-    policy, asset = session.run()
+    session = Environment(portfolio=Portfolio(c=5000, q=0),
+                          agent=agent,
+                          market=market,
+                          start_day=randint(0, floor(market.duration/2)),
+                          duration=100,
+                          )
+    agent, asset = session.run()
 
     running_reward.append(asset)
 

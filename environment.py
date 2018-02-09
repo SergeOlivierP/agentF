@@ -1,17 +1,17 @@
 import numpy as np
 
 
-class Session:
+class Environment:
 
-    def __init__(self, agent, policy, market,
+    def __init__(self, portfolio, agent, market,
                  start_day=0,
                  trade_cost=0.002,
                  sanction=0.05,
                  duration=500):
+        self.portfolio = portfolio
         self.agent = agent
-        self.policy = policy
         self.market = market
-        self.init_cash = self.agent.cash
+        self.init_cash = self.portfolio.cash
         self.start_day = start_day
         self.end_day = self.start_day + duration
         self.trade_cost = trade_cost
@@ -20,7 +20,7 @@ class Session:
     def run_transaction(self, y, stock_price, future):
 
         try:
-            self.agent.transaction(y, stock_price)
+            self.portfolio.transaction(y, stock_price)
             cost = self.trade_cost
         except ValueError:
             cost = self.sanction
@@ -33,8 +33,8 @@ class Session:
 
         for i in range(self.start_day, self.end_day-1):
 
-            state = np.concatenate((self.market.indices[i], self.agent.state), axis=0)
-            action_prob = self.policy.decide(state)
+            state = np.concatenate((self.market.indices[i], self.portfolio.state), axis=0)
+            action_prob = self.agent.decide(state)
 
             if np.random.uniform() < action_prob:
                 # transaction: "buy"
@@ -45,7 +45,7 @@ class Session:
 
             y_hat = self.run_transaction(y, self.market.stock_price[i], self.market.stock_price[i+1])
 
-            self.policy.train(state, y_hat, i)
+            self.agent.train(state, y_hat, i)
 
-        asset = self.agent.cash+self.agent.stock*self.market.stock_price[i]
-        return self.policy, asset
+        asset = self.portfolio.cash+self.portfolio.stock*self.market.stock_price[i]
+        return self.agent, asset
