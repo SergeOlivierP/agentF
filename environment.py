@@ -17,22 +17,20 @@ class Environment:
         self.sanction = sanction
 
     def run(self):
-        for i in range(self.end_day):
+        for i in range(1, self.end_day):
             state = np.concatenat(self.market.signals[i][:], self.portfolio.weights[i][:])
             decision = self.agent.decide(state)
             self.portfolio.update_transaction(decision, self.market.prices[i][:])
-            reward = self.compute_reward(self.portfolio, self.market)
+            sharpe_derivative = self.portfolio.process_sharpe_ratio()
+            reward = self.compute_reward(i, sharpe_derivative)
             self.agent.train(decision, reward)
 
         asset = self.portfolio.get_total_value(self.market.prices[i][:])
         return self.policy, asset
 
-    def compute_reward(portfolio, asset_returns, geo_parameter = .9, reward_learning_rate = .01):
+    def compute_reward(self, i, sharpe_derivative, reward_learning_rate=0.01):
 
-        portfolio.update_sharpe_stat(geo_parameter)
-                           
-        reward = (portfolio.weights[-1] + reward_learning_rate*portfolio.differential_sharpe_derivative[-1]*asset_returns )
+        asset_returns = self.market.prices[i]/self.market.prices[i-1] - 1
 
-        reward = np.exp(reward)/np.sum(np.exp(reward))
-
-        return reward
+        reward = (self.portfolio.weights[-1] + reward_learning_rate*sharpe_derivative*asset_returns)
+        return np.exp(reward)/np.sum(np.exp(reward))

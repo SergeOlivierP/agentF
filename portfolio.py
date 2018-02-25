@@ -3,7 +3,10 @@ import numpy as np
 
 class Portfolio:
 
-    def __init__(self, cash, market_size):
+    def __init__(self, cash, market_size, geo_parameter=0.9):
+
+        self.geo_parameter = geo_parameter
+
         # (T,N) matrices where t in [0,T] is the day and n in [0,N] is the asset.
         self.weights = np.zeros((1, market_size))
         self.weights[0][0] = 1
@@ -11,28 +14,32 @@ class Portfolio:
         self.quantities[0][0] = cash
 
         # (T,m) stats to compute sharpe ratio in the reward function
-        self.geo_mean_returns = 0
-        self.geo_mean2_returns = 0
-        self.differential_sharpe = 0
-        self.differential_sharpe_derivative = 0
-        
+        self.returns = [0]
+        self.geo_mean_returns = [0]
+        self.geo_mean2_returns = [0]
+        self.differential_sharpe = [0]
+        self.differential_sharpe_derivative = [0]
 
-    def update_sharpe_stat(self, geo_parameter):
+    def process_sharpe_ratio(self):
+        past_returns = self.returns[-1]
         # save the running geometric mean of returns
-        self.geo_mean_returns = np.append(self.geo_mean_returns,
-                                             geo_parameter*self.returns[-1] + (1-geo_parameter)*self.geo_mean_returns[-1])
+        new_geo_mean_returns = self.geo_parameter*past_returns + (1-self.geo_parameter)*self.geo_mean_returns[-1]
+        self.geo_mean_returns = np.append(self.geo_mean_returns, new_geo_mean_returns)
 
         # save the running geometric mean of returns squared
-        self.geo_mean2_returns = np.append(self.geo_mean2_returns,
-                                             geo_parameter*self.returns[-1]**2 + (1-geo_parameter)*self.geo_mean2_returns[-1])
-        
-        self.differential_sharpe = np.append(self.differential_sharpe,
-                                            ((self.returns[-1] - self.geo_mean_returns[-2])*self.geo_mean2_returns[-2]
-                                            - 0.5*self.geo_mean_returns[-2]*(self.returns[-1]**2 - self.geo_mean2_returns[-2]))
-                                            / (((self.geo_mean2_returns[-2]) - self.geo_mean_returns[-2]**2)**(3/2)) )
-        self.differential_sharpe_derivative = np.append(self.differential_sharpe_derivative,
-                                            (self.geo_mean2_returns[-2]-(self.geo_mean_returns[-2])*self.returns[-1])
-                                             / (((self.geo_mean2_returns[-2]) - self.geo_mean_returns[-2]**2)**(3/2)) )
+        new_geo_mean2_returns = self.geo_parameter*past_returns**2+(1-self.geo_parameter)*self.geo_mean2_returns[-1]
+        self.geo_mean2_returns = np.append(self.geo_mean2_returns, new_geo_mean2_returns)
+
+        new_differential_sharpe = (((past_returns-self.geo_mean_returns[-2])*self.geo_mean2_returns[-2]
+                                    - 0.5*self.geo_mean_returns[-2]*(past_returns**2 - self.geo_mean2_returns[-2]))
+                                   / (((self.geo_mean2_returns[-2]) - self.geo_mean_returns[-2]**2)**(3/2)))
+        self.differential_sharpe = np.append(self.differential_sharpe, new_differential_sharpe)
+
+        new_sharpe_derivative = ((self.geo_mean2_returns[-2]-(self.geo_mean_returns[-2])*past_returns)
+                                 / (((self.geo_mean2_returns[-2]) - self.geo_mean_returns[-2]**2)**(3/2)))
+        self.differential_sharpe_derivative = np.append(self.differential_sharpe_derivative, new_sharpe_derivative)
+
+        return self.differential_sharpe_derivative[-1]
 
     def get_total_value(self, prices):
         return np.sum(self.quantities[-1][:]*prices)
