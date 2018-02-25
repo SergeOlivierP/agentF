@@ -17,35 +17,19 @@ class Environment:
         self.trade_cost = trade_cost
         self.sanction = sanction
 
-    def run_transaction(self, y, stock_price, future):
+    def agent_decide(market, portfolio):
+        # The model outputs a new set of weights from the state of the day
+        decision = None
+        return decision  # weights
 
-        try:
-            self.portfolio.transaction(y, stock_price)
-            cost = self.trade_cost
-        except ValueError:
-            cost = self.sanction
+    def run_transaction(decision, portfolio):
+        # append new state to portfolio from the decision of the agent
+        portfolio_updated = None
+        return portfolio_updated
 
-        profit = future - cost - stock_price
+    def compute_reward(portfolio_updated, market):
+        reward = None
+        return reward
 
-        return 1 / (1 + np.exp(-profit))
-
-    def run(self):
-
-        for i in range(self.start_day, self.end_day-1):
-
-            state = np.concatenate((self.market.indices[i], self.portfolio.state), axis=0)
-            action_prob = self.agent.decide(state)
-
-            if np.random.uniform() < action_prob:
-                # transaction: "buy"
-                y = 1
-            else:
-                # transaction: "sell"
-                y = 0
-
-            y_hat = self.run_transaction(y, self.market.stock_price[i], self.market.stock_price[i+1])
-
-            self.agent.train(state, y_hat, i)
-
-        asset = self.portfolio.cash+self.portfolio.stock*self.market.stock_price[i]
-        return self.agent, asset
+    def agent_update(portfolio_updated, reward):
+        pass
