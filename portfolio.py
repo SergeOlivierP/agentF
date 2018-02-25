@@ -10,8 +10,29 @@ class Portfolio:
         self.quantities = np.zeros((1, market_size))
         self.quantities[0][0] = cash
 
-        # (T,m) index to compute sharpe ratio in the reward function
-        self.sharpe_cache = None
+        # (T,m) stats to compute sharpe ratio in the reward function
+        self.geo_mean_returns = 0
+        self.geo_mean2_returns = 0
+        self.differential_sharpe = 0
+        self.differential_sharpe_derivative = 0
+        
+
+    def update_sharpe_stat(self, geo_parameter):
+        # save the running geometric mean of returns
+        self.geo_mean_returns = np.append(self.geo_mean_returns,
+                                             geo_parameter*self.returns[-1] + (1-geo_parameter)*self.geo_mean_returns[-1])
+
+        # save the running geometric mean of returns squared
+        self.geo_mean2_returns = np.append(self.geo_mean2_returns,
+                                             geo_parameter*self.returns[-1]**2 + (1-geo_parameter)*self.geo_mean2_returns[-1])
+        
+        self.differential_sharpe = np.append(self.differential_sharpe,
+                                            ((self.returns[-1] - self.geo_mean_returns[-2])*self.geo_mean2_returns[-2]
+                                            - 0.5*self.geo_mean_returns[-2]*(self.returns[-1]**2 - self.geo_mean2_returns[-2]))
+                                            / (((self.geo_mean2_returns[-2]) - self.geo_mean_returns[-2]**2)**(3/2)) )
+        self.differential_sharpe_derivative = np.append(self.differential_sharpe_derivative,
+                                            (self.geo_mean2_returns[-2]-(self.geo_mean_returns[-2])*self.returns[-1])
+                                             / (((self.geo_mean2_returns[-2]) - self.geo_mean_returns[-2]**2)**(3/2)) )
 
     def update_transaction(self, target, prices):
         # append a new row to the weights and quantities as close as the target as possible,
