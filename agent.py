@@ -30,7 +30,7 @@ class Agent:
         X = state.reshape(1, state.shape[0])
         return self.model.predict(X, batch_size=1)
 
-    def train(self, decision, reward, i):
+    def train(self, decision, reward):
         # y_hat = np.around(y_hat)
         decision = np.vstack([decision])
         reward = np.vstack([reward])

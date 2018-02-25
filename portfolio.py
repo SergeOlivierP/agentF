@@ -13,6 +13,9 @@ class Portfolio:
         # (T,m) index to compute sharpe ratio in the reward function
         self.sharpe_cache = None
 
+    def get_total_value(self, prices):
+        return np.sum(self.quantities[-1][:]*prices)
+
     def update_transaction(self, target, prices):
         # append a new row to the weights and quantities as close as the target as possible,
         # adjusted by the transaction cost.

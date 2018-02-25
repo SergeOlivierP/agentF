@@ -16,19 +16,17 @@ class Environment:
         self.trade_cost = trade_cost
         self.sanction = sanction
 
-    def agent_decide(market, portfolio):
-        # The model outputs a new set of weights from the state of the day
-        decision = None
-        return decision  # weights
+    def run(self):
+        for i in range(self.end_day):
+            state = np.concatenat(self.market.signals[i][:], self.portfolio.weights[i][:])
+            decision = self.agent.decide(state)
+            self.portfolio.update_transaction(decision, self.market.prices[i][:])
+            reward = self.compute_reward(self.portfolio, self.market)
+            self.agent.train(decision, reward)
 
-    def run_transaction(decision, portfolio):
-        # append new state to portfolio from the decision of the agent
-        portfolio_updated = None
-        return portfolio_updated
+        asset = self.portfolio.get_total_value(self.market.prices[i][:])
+        return self.policy, asset
 
     def compute_reward(portfolio_updated, market):
         reward = None
         return reward
-
-    def agent_update(portfolio_updated, reward):
-        pass
