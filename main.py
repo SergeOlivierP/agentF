@@ -2,8 +2,8 @@ from agent import Agent
 from portfolio import Portfolio
 from environment import Environment
 from market import Market
-from math import floor
-from random import randint
+# from math import floor
+# from random import randint
 import numpy as np
 
 
