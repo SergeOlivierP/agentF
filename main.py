@@ -9,7 +9,7 @@ import numpy as np
 
 # Model hyperparameters
 
-num_iterations = 500000
+num_iterations = 1
 market = Market('IntelDataSet.csv')
 signals = market.signals.shape[0]
 market_size = market.asset_prices.shape[0]

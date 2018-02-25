@@ -22,4 +22,5 @@ class Market:
         # thats where we should modify the signals, e.g. standardization
         signals -= np.mean(signals, 0)
         signals /= np.std(signals, 0)
-        pass
+
+        return signals

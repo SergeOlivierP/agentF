@@ -14,29 +14,32 @@ class Portfolio:
         self.quantities[0][0] = cash
 
         # (T,m) stats to compute sharpe ratio in the reward function
-        self.returns = [0]
-        self.geo_mean_returns = [0]
-        self.geo_mean2_returns = [0]
-        self.differential_sharpe = [0]
-        self.differential_sharpe_derivative = [0]
+        self.returns = np.array([])
+        self.geo_mean_returns = np.array([0])
+        self.geo_mean2_returns = np.array([0])
+        self.differential_sharpe = np.array([0])
+        self.differential_sharpe_derivative = np.array([0])
+
+    def set_portfolio_return(self, asset_returns):
+        r = np.sum(asset_returns * self.weights[-1])
+        self.returns = np.append(self.returns, r)
 
     def process_sharpe_ratio(self):
-        past_returns = self.returns[-1]
+        portfolio_return = self.returns[-1]
+        A = self.geo_mean_returns[-1]
+        B = self.geo_mean2_returns[-1]
         # save the running geometric mean of returns
-        new_geo_mean_returns = self.geo_parameter*past_returns + (1-self.geo_parameter)*self.geo_mean_returns[-1]
+        new_geo_mean_returns = self.geo_parameter*portfolio_return + (1-self.geo_parameter)*A
         self.geo_mean_returns = np.append(self.geo_mean_returns, new_geo_mean_returns)
 
         # save the running geometric mean of returns squared
-        new_geo_mean2_returns = self.geo_parameter*past_returns**2+(1-self.geo_parameter)*self.geo_mean2_returns[-1]
+        new_geo_mean2_returns = self.geo_parameter*portfolio_return**2+(1-self.geo_parameter)*B
         self.geo_mean2_returns = np.append(self.geo_mean2_returns, new_geo_mean2_returns)
-
-        new_differential_sharpe = (((past_returns-self.geo_mean_returns[-2])*self.geo_mean2_returns[-2]
-                                    - 0.5*self.geo_mean_returns[-2]*(past_returns**2 - self.geo_mean2_returns[-2]))
-                                   / (((self.geo_mean2_returns[-2]) - self.geo_mean_returns[-2]**2)**(3/2)))
+       
+        new_differential_sharpe = ((portfolio_return-A)*B - 0.5*A*(portfolio_return**2 - B)) / ((B - A**2)**(3/2))
         self.differential_sharpe = np.append(self.differential_sharpe, new_differential_sharpe)
 
-        new_sharpe_derivative = ((self.geo_mean2_returns[-2]-(self.geo_mean_returns[-2])*past_returns)
-                                 / (((self.geo_mean2_returns[-2]) - self.geo_mean_returns[-2]**2)**(3/2)))
+        new_sharpe_derivative = ((B-A*portfolio_return) / ((B - A**2)**(3/2))
         self.differential_sharpe_derivative = np.append(self.differential_sharpe_derivative, new_sharpe_derivative)
 
         return self.differential_sharpe_derivative[-1]
