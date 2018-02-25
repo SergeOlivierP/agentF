@@ -11,7 +11,6 @@ class Environment:
         self.portfolio = portfolio
         self.agent = agent
         self.market = market
-        self.init_cash = self.portfolio.cash
         self.start_day = start_day
         self.end_day = self.start_day + duration
         self.trade_cost = trade_cost
