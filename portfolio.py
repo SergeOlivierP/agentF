@@ -34,6 +34,9 @@ class Portfolio:
                                             (self.geo_mean2_returns[-2]-(self.geo_mean_returns[-2])*self.returns[-1])
                                              / (((self.geo_mean2_returns[-2]) - self.geo_mean_returns[-2]**2)**(3/2)) )
 
+    def get_total_value(self, prices):
+        return np.sum(self.quantities[-1][:]*prices)
+
     def update_transaction(self, target, prices):
         # append a new row to the weights and quantities as close as the target as possible,
         # adjusted by the transaction cost.
