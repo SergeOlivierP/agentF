@@ -2,14 +2,14 @@ from agent import Agent
 from portfolio import Portfolio
 from environment import Environment
 from market import Market
-from math import floor
-from random import randint
+# from math import floor
+# from random import randint
 import numpy as np
 
 
 # Model hyperparameters
 
-num_iterations = 500000
+num_iterations = 1
 market = Market('IntelDataSet.csv')
 signals = market.signals.shape[0]
 market_size = market.asset_prices.shape[0]
