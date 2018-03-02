@@ -5,4 +5,4 @@ The agent will decide, on each timestep, of an asset portfolio weight vector and
 The optimization is done with respect to the differential Sharpe Ratio.
 TODO:
 - Include some temporality and recurrence in the model or in the data processing.
-- Complexify the reward to give more accurate credit to the right actionsé
+- Complexify the reward to give more accurate credit to the right actions.
