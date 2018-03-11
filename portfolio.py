@@ -35,7 +35,7 @@ class Portfolio:
         # save the running geometric mean of returns squared
         new_geo_mean2_returns = self.geo_parameter*portfolio_return**2+(1-self.geo_parameter)*B
         self.geo_mean2_returns = np.append(self.geo_mean2_returns, new_geo_mean2_returns)
-       
+
         new_differential_sharpe = ((portfolio_return-A)*B - 0.5*A*(portfolio_return**2 - B)) / ((B - A**2)**(3/2))
         self.differential_sharpe = np.append(self.differential_sharpe, new_differential_sharpe)
 

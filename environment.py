@@ -21,7 +21,6 @@ class Environment:
             state = np.concatenate(self.market.signals[i][:], self.portfolio.weights[i][:])
             decision = self.agent.decide(state)
             self.portfolio.update_transaction(decision, self.market.prices[i][:])
-            
             asset_returns = self.market.prices[i+1]/self.market.prices[i] - 1
             self.portfolio.set_portfolio_return(asset_returns)
             sharpe_derivative = self.portfolio.process_sharpe_ratio()
