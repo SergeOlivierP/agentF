@@ -44,6 +44,12 @@ class PortfolioTest(unittest.TestCase):
         pf.update_transaction(target, prices)
         self.assertTrue((pf.quantities == np.array([[10, 0, 0], [3, 2, 1]])).all())
 
+    def test_portfolio_returns(self)
+        asset_returns = np.array([.01,-.05])
+        pass
+
+    def test_portfolio_sharpe_ratio(self):
+        pass
 
 if __name__ == '__main__':
     unittest.main()

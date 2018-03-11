@@ -39,7 +39,7 @@ class Portfolio:
         new_differential_sharpe = ((portfolio_return-A)*B - 0.5*A*(portfolio_return**2 - B)) / ((B - A**2)**(3/2))
         self.differential_sharpe = np.append(self.differential_sharpe, new_differential_sharpe)
 
-        new_sharpe_derivative = ((B-A*portfolio_return) / ((B - A**2)**(3/2))
+        new_sharpe_derivative = (B-A*portfolio_return) / ((B - A**2)**(3/2))
         self.differential_sharpe_derivative = np.append(self.differential_sharpe_derivative, new_sharpe_derivative)
 
         return self.differential_sharpe_derivative[-1]
