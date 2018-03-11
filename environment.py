@@ -28,7 +28,7 @@ class Environment:
             self.agent.train(state, reward)
         print( "last decision", decision )
         print("last rew", reward)
-        print(self.portfolio.quantities[-1])
+        print("last quantities: ", self.portfolio.quantities[-1])
 
         asset = self.portfolio.get_total_value(self.market.asset_prices[i][:])
         return self.agent, asset
