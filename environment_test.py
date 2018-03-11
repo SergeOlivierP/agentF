@@ -17,8 +17,8 @@ class EnvironmentTest(unittest.TestCase):
         self.environment = Environment(self.portfolio, self.agent, self.market)
 
     def test_compute_reward(self):
-
-        reward = self.environment.compute_reward(1, sharpe_derivative=0.1)
+        asset_returns = np.array([[0, 0.5]])
+        reward = self.environment.compute_reward(1, asset_returns, sharpe_derivative=0.1)
 
         self.assertTrue(np.sum(reward) == 1)
         self.assertTrue(np.all(reward) > 0)
