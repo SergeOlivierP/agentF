@@ -17,7 +17,7 @@ class Portfolio:
         self.returns = np.array([0])
         self.geo_mean_returns = np.array([0])
         self.geo_mean2_returns = np.array([0])
-        # The first 10 days diff sharpe are set to zero to get a 
+        # The first 10 days diff sharpe are set to zero to get a
         # first diff sharpe value that makes sense
         self.differential_sharpe = np.zeros((10,))
         self.differential_sharpe_derivative = np.zeros((10,))

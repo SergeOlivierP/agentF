@@ -17,11 +17,10 @@ class Market:
         # temporarily force coded the cash asset
         # self.asset_prices = self.rawData.IntelPriceUSD.values
         asset_risk_free = np.ones([self.duration, 1])
-        asset_others    = self.rawData.iloc[:, 1:number_of_assets+1].values.reshape(self.duration, number_of_assets)
+        asset_others = self.rawData.iloc[:, 1:number_of_assets+1].values.reshape(self.duration, number_of_assets)
         self.asset_prices = np.append(asset_risk_free, asset_others, axis=1)
         # temporarily force add the cash asset in total number of asset
         self.number_of_assets = number_of_assets + 1
-
 
     def preprocess_data(self, signals):
         # input := np.array

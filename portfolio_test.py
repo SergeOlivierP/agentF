@@ -45,22 +45,22 @@ class PortfolioTest(unittest.TestCase):
         self.assertTrue((pf.quantities == np.array([[10, 0, 0], [3, 2, 1]])).all())
 
     def test_portfolio_returns(self):
-        asset_returns = np.array([.01,-.05, 0.1, .01, 0.03])
+        asset_returns = np.array([0.01, -0.05, 0.1, 0.01, 0.03])
         self.pf.set_portfolio_return(asset_returns)
         self.assertEqual(self.pf.returns[-1], asset_returns[0])
 
     def test_portfolio_sharpe_ratio(self):
-        self.pf.returns = np.append( self.pf.returns, 0.01 )
+        self.pf.returns = np.append(self.pf.returns, 0.01)
         self.pf.process_sharpe_ratio()
-        self.pf.returns = np.append( self.pf.returns, -0.02 )
+        self.pf.returns = np.append(self.pf.returns, -0.02)
         self.pf.process_sharpe_ratio()
-        self.assertAlmostEqual(self.pf.differential_sharpe_derivative[-1], 10000, places = 4)
-        self.assertAlmostEqual(self.pf.differential_sharpe[-1], -148.33333, places = 4)
-        self.pf.returns = np.append( self.pf.returns, 0.005 )
+        self.assertAlmostEqual(self.pf.differential_sharpe_derivative[-1], 10000, places=4)
+        self.assertAlmostEqual(self.pf.differential_sharpe[-1], -148.33333, places=4)
+        self.pf.returns = np.append(self.pf.returns, 0.005)
         self.pf.process_sharpe_ratio()
-        self.assertAlmostEqual(self.pf.differential_sharpe_derivative[-1], 678.071956, places = 4)
-        self.assertAlmostEqual(self.pf.differential_sharpe[-1], 7.778358, places = 4)
-       
+        self.assertAlmostEqual(self.pf.differential_sharpe_derivative[-1], 678.071956, places=4)
+        self.assertAlmostEqual(self.pf.differential_sharpe[-1], 7.778358, places=4)
+
 
 if __name__ == '__main__':
     unittest.main()

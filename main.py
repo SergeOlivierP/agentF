@@ -13,7 +13,9 @@ num_iterations = 1
 market = Market('IntelDataSet.csv')
 # signals = market.signals.shape[1]
 # market_size = market.asset_prices.shape[0]
-agent = Agent(input_dim=market.number_of_signals+market.number_of_assets, output_dim=market.number_of_assets, learning_rate=1e-1)
+agent = Agent(input_dim=market.number_of_signals+market.number_of_assets,
+              output_dim=market.number_of_assets,
+              learning_rate=1e-1)
 running_reward = []
 
 
