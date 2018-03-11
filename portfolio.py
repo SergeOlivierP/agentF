@@ -14,11 +14,13 @@ class Portfolio:
         self.quantities[0][0] = cash
 
         # (T,m) stats to compute sharpe ratio in the reward function
-        self.returns = np.array([])
+        self.returns = np.array([0])
         self.geo_mean_returns = np.array([0])
         self.geo_mean2_returns = np.array([0])
-        self.differential_sharpe = np.array([0])
-        self.differential_sharpe_derivative = np.array([0])
+        # The first 10 days diff sharpe are set to zero to get a 
+        # first diff sharpe value that makes sense
+        self.differential_sharpe = np.zeros((10,))
+        self.differential_sharpe_derivative = np.zeros((10,))
 
     def set_portfolio_return(self, asset_returns):
         r = np.sum(asset_returns * self.weights[-1])
@@ -36,11 +38,12 @@ class Portfolio:
         new_geo_mean2_returns = self.geo_parameter*portfolio_return**2+(1-self.geo_parameter)*B
         self.geo_mean2_returns = np.append(self.geo_mean2_returns, new_geo_mean2_returns)
 
-        new_differential_sharpe = ((portfolio_return-A)*B - 0.5*A*(portfolio_return**2 - B)) / ((B - A**2)**(3/2))
-        self.differential_sharpe = np.append(self.differential_sharpe, new_differential_sharpe)
+        if len(self.returns) > 10:
+            new_differential_sharpe = ((portfolio_return-A)*B - 0.5*A*(portfolio_return**2 - B)) / ((B - A**2)**(3/2))
+            self.differential_sharpe = np.append(self.differential_sharpe, new_differential_sharpe)
 
-        new_sharpe_derivative = (B-A*portfolio_return) / ((B - A**2)**(3/2))
-        self.differential_sharpe_derivative = np.append(self.differential_sharpe_derivative, new_sharpe_derivative)
+            new_sharpe_derivative = (B-A*portfolio_return) / ((B - A**2)**(3/2))
+            self.differential_sharpe_derivative = np.append(self.differential_sharpe_derivative, new_sharpe_derivative)
 
         return self.differential_sharpe_derivative[-1]
 
@@ -65,7 +68,7 @@ class Portfolio:
         delta_quantities = np.floor(assets_budget/prices)
 
         # adjust quantities accordingly, transaction costs will be here
-        new_quantities = self.quantities+delta_quantities
+        new_quantities = self.quantities[[-1]]+delta_quantities
         self.quantities = np.append(self.quantities, new_quantities, axis=0)
 
         # sum unalocated money
@@ -73,6 +76,6 @@ class Portfolio:
         self.quantities[-1][0] = self.quantities[-1][0] + unalocated_money
 
         # Compute new real weights
-        assets_values = self.quantities[-1][:]*prices
+        assets_values = self.quantities[[-1]]*prices
         new_weights = assets_values/np.sum(assets_values)
         self.weights = np.append(self.weights, new_weights, axis=0)

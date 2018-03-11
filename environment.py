@@ -17,19 +17,24 @@ class Environment:
         self.sanction = sanction
 
     def run(self):
-        for i in range(1, self.end_day):
-            state = np.concatenate(self.market.signals[i][:], self.portfolio.weights[i][:])
+        for i in range(0, self.end_day):
+            state = np.concatenate((self.market.signals[i][:], self.portfolio.weights[i][:]))
             decision = self.agent.decide(state)
-            self.portfolio.update_transaction(decision, self.market.prices[i][:])
-            asset_returns = self.market.prices[i+1]/self.market.prices[i] - 1
+            self.portfolio.update_transaction(decision, self.market.asset_prices[i][:])
+            asset_returns = self.market.asset_prices[i+1]/self.market.asset_prices[i] - 1
             self.portfolio.set_portfolio_return(asset_returns)
             sharpe_derivative = self.portfolio.process_sharpe_ratio()
             reward = self.compute_reward(i, asset_returns, sharpe_derivative)
-            self.agent.train(decision, reward)
+            self.agent.train(state, reward)
+        print( "last decision", decision )
+        print("last rew", reward)
+        print(self.portfolio.quantities[-1])
 
-        asset = self.portfolio.get_total_value(self.market.prices[i][:])
-        return self.policy, asset
+        asset = self.portfolio.get_total_value(self.market.asset_prices[i][:])
+        return self.agent, asset
 
-    def compute_reward(self, i, asset_returns, sharpe_derivative, reward_learning_rate=0.01):
+    def compute_reward(self, i, asset_returns, sharpe_derivative, reward_learning_rate=0.5):
         reward = (self.portfolio.weights[-1] + reward_learning_rate*sharpe_derivative*asset_returns)
+        print("before mod reward:", reward) 
+        # the following softmax operation makes sure the weights are positive and sum to 1
         return np.exp(reward)/np.sum(np.exp(reward))

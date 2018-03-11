@@ -11,9 +11,9 @@ import numpy as np
 
 num_iterations = 1
 market = Market('IntelDataSet.csv')
-signals = market.signals.shape[0]
-market_size = market.asset_prices.shape[0]
-agent = Agent(input_dim=signals+market_size, output_dim=market_size, learning_rate=1e-4)
+# signals = market.signals.shape[1]
+# market_size = market.asset_prices.shape[0]
+agent = Agent(input_dim=market.number_of_signals+market.number_of_assets, output_dim=market.number_of_assets, learning_rate=1e-1)
 running_reward = []
 
 
@@ -22,17 +22,17 @@ running_reward = []
 
 for j in range(num_iterations):
 
-    session = Environment(portfolio=Portfolio(cash=5000, market_size=market_size),
+    session = Environment(portfolio=Portfolio(cash=5000, market_size=market.number_of_assets),
                           agent=agent,
                           market=market,
                           start_day=2,
-                          duration=100,
+                          duration=20,
                           )
     agent, asset = session.run()
 
     running_reward.append(asset)
 
-    if j % 100 == 0:
+    if j % 10 == 0:
         mean = np.mean(running_reward)
         std = np.std(running_reward)
         running_reward = []
